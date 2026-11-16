@@ -1,0 +1,19 @@
+# Model workers run in their own interpreters (config: runtimes.asr_python / runtimes.speaker_python),
+# so their heavy dependencies never load into the service. Install each group into its own venv.
+# Versions below are the ones the pipeline was built against; newer releases are untested.
+
+# --- Speaker embeddings + per-chunk diarization (plaud_workflow/speaker_worker.py)
+# sherpa-onnx
+# numpy
+
+# --- ASR backend "whisper" (default; plaud_workflow/asr_worker.py)
+# openai-whisper
+# torch
+
+# --- ASR backend "qwen3" (plaud_workflow/qwen_asr_worker.py; Apple silicon, MLX)
+# mlx==0.32.0
+# mlx-audio==0.4.6
+# numpy
+
+# --- Not Python: ffmpeg/ffprobe, the PLAUD CLI (Node), and the Nemotron diarization
+# runtime (nemo-speech binary + Nemotron-3-Diarization GGUF) - see README.

@@ -1,0 +1,10 @@
+File Details:
+  id: of_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  name: Synthetic pending recording
+  created_at: 2026-11-11T02:03:04Z
+  start_at: 2026-11-11T02:04:00Z
+  duration: 300
+  serial_number: SYNTHETIC-DEVICE-2
+  audio: available
+  transcript: unavailable
+  summary: unavailable

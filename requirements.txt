@@ -1,0 +1,4 @@
+# Service, CLI and test suite (Python 3.12+; developed on 3.14, macOS / Apple silicon).
+# The service itself is standard library plus numpy.
+numpy>=2.0
+pytest>=8.0

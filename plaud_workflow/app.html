@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PLAUD · Local library</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#23252a;background:#f6f5f2;font-size:15px}*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button,a{touch-action:manipulation}button{cursor:pointer;border:1px solid #d7d8da;border-radius:9px;background:white;padding:9px 14px;color:inherit}button:hover{background:#f2f3f4}button:disabled{opacity:.5;cursor:wait}button.primary{background:#24272b;color:white;border-color:#24272b}a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}header{height:70px;background:white;border-bottom:1px solid #e3e3e0;display:flex;align-items:center;justify-content:space-between;padding:0 32px}.brand{font-size:21px;font-weight:750;letter-spacing:1px}.brand span{color:#e67a58}.badge{font-size:12px;background:#eef1ed;color:#4f6650;border-radius:20px;padding:6px 10px}nav{display:flex;gap:22px;align-items:center}main{max-width:1120px;margin:36px auto;padding:0 24px}h1{font-size:30px;line-height:1.25;letter-spacing:-.5px}h2{font-size:20px}.muted{color:#777b82;font-size:13px}.bar{display:flex;justify-content:space-between;align-items:center;gap:16px}.card{background:white;border:1px solid #e5e4e0;border-radius:13px;padding:24px;margin:15px 0;box-shadow:0 3px 12px #20202003}.record{display:block}.record h2{margin:8px 0 12px}.status{font-size:12px;border-radius:6px;background:#f2f2ed;padding:5px 8px}.error{color:#a33525;background:#fff1eb;border:1px solid #f3c7b8;padding:12px;border-radius:8px;white-space:pre-wrap}.notice{background:#edf3f7;border-radius:8px;padding:12px;color:#3a566d}.hidden{display:none!important}.audio{position:sticky;top:0;background:#f6f5f2;padding:12px 0;z-index:2}audio{width:100%;height:44px}.segment{display:grid;grid-template-columns:80px 150px 1fr;gap:15px;padding:18px 0;border-bottom:1px solid #efefec;scroll-margin-top:80px}.time{color:#888;font-variant-numeric:tabular-nums;background:none;border:0;padding:6px 0;text-align:left}.speaker{border:0;color:#80674f;background:#f6f1e9;padding:6px 10px;font-size:13px;text-align:left;align-self:start}.segment p{margin:4px 0;line-height:1.8;white-space:pre-wrap}.segment:target{background:#fff8dc}.overlay{position:fixed;inset:0;background:#0006;z-index:10;display:flex;align-items:center;justify-content:center;padding:20px}.panel{width:560px;max-height:94vh;overflow:auto;background:white;border-radius:17px;padding:28px;box-shadow:0 20px 80px #0004}.panel h2{font-size:28px;margin:0 0 20px}.panel label{display:block;margin:16px 0}.panel input[type=text],.panel input[type=number],select{width:100%;padding:13px;border:1px solid #d4d6d8;border-radius:8px}.panel input[type=radio]{margin-right:8px}.choices{display:flex;flex-direction:column;gap:6px}.choices button{text-align:left;border:0;border-bottom:1px solid #eee;border-radius:0;padding:13px 3px;display:flex;justify-content:space-between}.selected{background:#eef3f1!important}.save{width:100%;padding:14px;margin-top:20px}.close{float:right;border:0;font-size:23px;padding:0 6px}.tabs{display:flex;gap:10px}.summary li{margin:12px 0;line-height:1.7}.score{font-size:12px;color:#697a70}.empty{text-align:center;padding:50px;color:#858585}.two{display:grid;grid-template-columns:1fr 1fr;gap:15px}.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:15px;margin:18px 0}.tile{background:white;border:1px solid #e5e4e0;border-radius:13px;padding:20px}button.tile{width:100%;text-align:left;font:inherit;color:inherit;display:block}button.tile:hover{background:white;border-color:#b9bcb6}.tile.on{border-color:#2f6b45;box-shadow:0 0 0 2px #2f6b4526}.tile.on .n{color:#2f6b45}.tile .n{font-size:34px;font-weight:700;letter-spacing:-1px}.tile .l{font-size:13px;color:#777b82;margin-top:4px}.prog{height:8px;background:#eceae5;border-radius:6px;overflow:hidden;margin:14px 0}.prog i{display:block;height:100%;background:#4f7d5c}table.rows{width:100%;border-collapse:collapse;font-size:14px}table.rows td,table.rows th{text-align:left;padding:10px 8px;border-bottom:1px solid #eeede9;vertical-align:top}table.rows th{font-size:12px;color:#777b82;font-weight:600}.pill{font-size:11px;border-radius:20px;padding:3px 9px;background:#f2f2ed;color:#5a5f57;white-space:nowrap}.pill.ok{background:#e8f2ea;color:#3d6b4c}.pill.run{background:#fdf3e2;color:#8a6420}.pill.bad{background:#fbeae6;color:#a33525}.model{font-size:11px;color:#8a7f6d;background:#f7f4ee;border-radius:5px;padding:2px 7px;white-space:nowrap}.gauge{display:flex;height:26px;border-radius:7px;overflow:hidden;margin:10px 0;border:1px solid #e5e4e0}.gauge div{display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;min-width:0}.g-agree{background:#4f7d5c}.g-diff{background:#c2743f}.g-miss{background:#a33525}.cmp{display:grid;grid-template-columns:70px 1fr 1fr;gap:14px;padding:14px 0;border-bottom:1px solid #efefec}.cmp .lab{font-size:11px;color:#8a8f86;margin-bottom:4px}.ins{background:#e6f0e8;border-radius:3px}.del{background:#fae5de;border-radius:3px}.cmp{grid-template-columns:92px 1fr 1fr}.side{display:grid;grid-template-columns:34px 1fr;gap:9px;align-items:start}.tick{width:30px;height:30px;border-radius:8px;border:1px solid #d7d8da;background:#fff;color:#b9bcc0;font-size:15px;line-height:1;padding:0;display:flex;align-items:center;justify-content:center}.tick:hover{border-color:#4f7d5c;color:#4f7d5c}.tick.on{background:#2f6b45;border-color:#2f6b45;color:#fff}.edit{width:100%;font-size:12px;padding:4px 6px;margin-bottom:6px;border-radius:7px}.edit.on{background:#7a5a2e;border-color:#7a5a2e;color:#fff}.pick{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}.pick button{font-size:12px;padding:5px 10px;border-radius:7px}.pick button.on{background:#2f6b45;color:#fff;border-color:#2f6b45}.seek{border:0;background:#f1f0ec;border-radius:6px;padding:5px 8px;font-variant-numeric:tabular-nums;width:100%;text-align:left}.seek:hover{background:#e7e5df}.spk{border:0;background:#f6f1e9;color:#80674f;border-radius:5px;padding:2px 7px;font-size:11px;cursor:pointer}.spk:hover{background:#efe6d8}.edited{font-size:12px;color:#2f6b45;margin-top:6px}.legend{display:flex;gap:16px;font-size:12px;color:#777b82;margin:6px 0 14px}.legend b{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}@media(max-width:700px){header{padding:0 16px}nav{gap:12px}main{padding:0 16px;margin:20px auto}.segment{grid-template-columns:60px 1fr;gap:8px}.segment p{grid-column:2}.panel{padding:20px}h1{font-size:25px}}
+</style></head><body>
+<header><a class="brand" id="home">PLAUD<span> · </span><small>local</small></a><nav><a id="progressLink">Progress</a><a id="libraryLink">Recordings</a><a id="profilesLink">Voices</a><a id="lookupLink">Identify a sample</a><span class="badge">On this Mac</span></nav></header>
+<main><div id="globalError" class="error hidden" role="alert"></div><div id="content"></div></main>
+<div id="modal" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="panel"><button class="close" id="closeModal" aria-label="Close">×</button><h2 id="modalTitle">Name this speaker</h2><div id="modalContent"></div></div></div>
+<script>
+const prefix=__APP_PREFIX__;
+const $=id=>document.getElementById(id),el=(tag,text,cls)=>{let e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e};
+const api=async(path,data)=>{let r=await fetch(prefix+path,data?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}:{});let j=await r.json();if(!r.ok){let e=Error(j.error||'Request failed');e.code=j.code;throw e}return j};
+const stamp=n=>`${Math.floor(n/60).toString().padStart(2,'0')}:${Math.floor(n%60).toString().padStart(2,'0')}`;
+const humanStatus=s=>({downloaded:'Audio ready',transcribed:'Transcript ready',ready:'Ready',review:'Summary needs review',queued:'Queued',running:'Processing',failed:'Needs attention'})[s]||s;
+const showError=e=>{$('globalError').textContent=e.message;$('globalError').classList.remove('hidden')};
+const button=(text,fn,cls)=>{let b=el('button',text,cls);b.onclick=()=>Promise.resolve(fn()).catch(showError);return b};
+function audioFor(rid){let a=el('audio');a.controls=true;a.preload='metadata';a.src=prefix+'/audio/'+encodeURIComponent(rid);return a}
+function openModal(title){$('modalTitle').textContent=title;$('modalContent').replaceChildren();$('modal').classList.remove('hidden');return $('modalContent')}
+function closeModal(){$('modal').classList.add('hidden');$('modalContent').querySelectorAll('audio').forEach(a=>a.pause())}
+$('closeModal').onclick=closeModal;$('modal').onclick=e=>{if(e.target===$('modal'))closeModal()};document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+for(let [id,path] of [['home','/'],['progressLink','/'],['libraryLink','/library'],['profilesLink','/profiles'],['lookupLink','/lookup']])$(id).href=prefix+path;
+let current,mainAudio;
+async function progress(){
+  let c=$('content');c.replaceChildren(el('h1','Progress'));
+  let d=await api('/api/progress');
+  let recs=d.recordings, done=recs.filter(r=>r.status==='transcribed'||r.status==='ready');
+  let withAudio=recs.filter(r=>r.has_audio);
+  let failed=recs.filter(r=>r.job_state==='failed');
+  // Each tile filters the table below it. "audio received" is the whole set, so
+  // it doubles as the clear; clicking the tile already showing also clears.
+  // Its count comes from PLAUD discovery, which can lead the recordings table —
+  // when the two disagree, say so rather than showing a short list under a big number.
+  // How far each recording has got against its PLAUD reference. A recording with no
+  // reference is not inaccurate — PLAUD only transcribes what you spend quota on — so
+  // it gets its own bucket rather than being counted as a miss.
+  let cmp=d.comparison||{};
+  const has=o=>Object.keys(o||{}).length, cmpOf=r=>cmp[r.id];
+  let refs=new Set(d.reference||[]);
+  let judged=recs.filter(r=>has((cmpOf(r)||{}).audio_verdicts));
+  let unjudged=recs.filter(r=>{let v=cmpOf(r);return v&&!has(v.audio_verdicts)});
+  let ready=recs.filter(r=>!cmpOf(r)&&refs.has(r.id));
+  let noref=recs.filter(r=>!cmpOf(r)&&!refs.has(r.id));
+  let A={total:0,auto:0,esc:0,sens:0},V={};
+  for(let v of Object.values(cmp)){
+    A.total+=v.total;A.auto+=v.auto_cosmetic;A.esc+=v.escalated;A.sens+=v.sensitive||0;
+    for(let k in v.audio_verdicts||{})V[k]=(V[k]||0)+v.audio_verdicts[k];
+  }
+  let spans=Object.values(V).reduce((a,b)=>a+b,0);
+  const share=n=>spans?Math.round(100*(n||0)/spans)+'%':'\u2014';
+
+  const views={
+    all:   {n:d.received,       rows:recs,      label:'audio received',note:'in your PLAUD account'},
+    audio: {n:withAudio.length, rows:withAudio, label:'downloaded',    note:'original audio on this Mac'},
+    done:  {n:done.length,      rows:done,      label:'transcribed',   note:'click a row to read and name speakers'},
+    failed:{n:failed.length,    rows:failed,    label:'failed',        note:failed.length?'needs attention':'none'},
+    judged:  {n:judged.length,   rows:judged,   label:'judged against audio',
+              note:spans?`ours right ${share(V.ours)} over ${spans} spans`:'none judged yet'},
+    unjudged:{n:unjudged.length, rows:unjudged, label:'compared, not judged',
+              note:unjudged.length?'differences found, audio not yet heard':'none waiting'},
+    ready:   {n:ready.length,    rows:ready,    label:'reference ready, not compared',
+              note:'PLAUD has the transcript; the comparison has not been run'},
+    noref:   {n:noref.length,    rows:noref,    label:'no PLAUD transcript',
+              note:'PLAUD only transcribes what you spend quota on'}};
+  let view='all',buttons={};
+  // One filter state across both rows: picking an accuracy tile clears the progress tile.
+  function tileRow(keys){
+    let row=el('div',undefined,'tiles');
+    for(let key of keys){
+      let v=views[key],t=el('button',undefined,'tile');t.type='button';
+      t.append(el('div',String(v.n),'n'),el('div',v.label,'l'),el('div',v.note,'muted'));
+      t.title=key==='all'?'Show every recording':`Show only: ${v.label}`;
+      t.onclick=()=>show(view===key?'all':key);
+      buttons[key]=t;row.append(t);
+    }
+    return row;
+  }
+  c.append(tileRow(['all','audio','done','failed']));
+  if(d.received){let bar=el('div',undefined,'prog');let i=el('i');i.style.width=Math.round(100*done.length/d.received)+'%';bar.append(i);c.append(bar);
+    c.append(el('p',`${done.length} of ${d.received} transcribed`,'muted'))}
+  if(d.intake_error)c.append(el('p',d.intake_error,'error'));
+  if(d.worker)c.append(el('p',`Working now: ${d.worker.stage}${d.worker.total_chunks?` · part ${d.worker.chunk} of ${d.worker.total_chunks}`:''}`,'notice'));
+  else c.append(el('p','Worker idle.','muted'));
+  let recon=d.reconciliation||await api('/api/reconciliation');
+  let rcard=el('div',undefined,'card'),rbar=el('div',undefined,'bar');
+  rbar.append(el('h2','Reference reconciliation'),button('Reconcile now',async()=>{await api('/api/reconciliation/run',{});await progress()},'primary'));
+  rcard.append(rbar);
+  let currentRun=recon.current_run;
+  rcard.append(el('p',currentRun?`${currentRun.kind} · ${currentRun.state} · page ${currentRun.cursor_page}`:'Idle','notice'));
+  let full=recon.last_successful_full,targeted=recon.last_successful_targeted;
+  rcard.append(el('p',`Last full success: ${full?new Date(full.finished*1000).toLocaleString():'not yet'} · Last targeted success: ${targeted?new Date(targeted.finished*1000).toLocaleString():'not yet'}`,'muted'));
+  let counts=recon.counters||{};
+  rcard.append(el('p',`Scanned ${counts.scanned||0} · matched ${counts.matched||0} · remote-only ${counts.remote_only||0} · local-not-seen ${counts.local_not_seen||0} · unavailable ${counts.unavailable||0} · fetched ${counts.fetched||0} · unchanged ${counts.unchanged||0} · changed ${counts.changed||0} · compared ${counts.compared||0} · deferred ${counts.deferred||0} · failed ${counts.failed||0}`,'muted'));
+  rcard.append(el('p',`${recon.unresolved?.count||0} unresolved · oldest ${Math.round((recon.unresolved?.oldest_age||0)/3600)}h`,'muted'));
+  if((recon.error_classes||[]).length)rcard.append(el('p',`Errors: ${recon.error_classes.join(', ')}`,'error'));
+  c.append(rcard);
+
+  if(refs.size||has(cmp)){
+    c.append(el('h2','Accuracy vs PLAUD'));
+    let line=`${Object.keys(cmp).length} of ${refs.size} recordings with a PLAUD transcript have been compared. `
+      +`${A.total} differences \u00b7 `
+      +`${A.auto} cosmetic, auto-resolved \u00b7 ${A.esc} needed judgement`
+      +(A.sens?` \u00b7 ${A.sens} held local-only (sensitive)`:'');
+    if(spans)line+=`. Of ${spans} contested spans heard against the audio: `
+      +`PLAUD right ${share(V.reference)} \u00b7 ours right ${share(V.ours)} \u00b7 neither ${share((V.neither||0)+(V.unclear||0))}.`;
+    c.append(el('p',line,'muted'));
+    c.append(tileRow(['judged','unjudged','ready','noref']));
+  }
+
+  let card=el('div',undefined,'card');
+  let head=el('div',undefined,'bar');
+  let heading=el('h2','Recordings'),clear=button('Show all',()=>show('all'));
+  head.append(heading,clear);card.append(head);
+  let gap=el('p',undefined,'muted');card.append(gap);
+  let tb=el('table',undefined,'rows'),thead=el('thead'),body=el('tbody');
+  let hr=el('tr');['Recording','Length · model','State','Speakers','Listen','Transcript','vs PLAUD','Unknowns'].forEach(h=>hr.append(el('th',h)));
+  thead.append(hr);tb.append(thead,body);
+  card.append(tb);c.append(card);
+
+  function rowFor(r){
+    let tr=el('tr');
+    tr.append(el('td',r.name||r.id));
+    let dcell=el('td');dcell.append(el('div',r.duration?`${Math.round(r.duration/60)}m`:'—'));
+    if(r.asr_model)dcell.append(el('span',r.asr_model,'model'));
+    tr.append(dcell);
+    let st=el('td'),state=r.status==='transcribed'||r.status==='ready'?['transcribed','ok']
+      :r.job_state==='failed'?['failed','bad']
+      :r.job_state==='running'?[r.stage||'running','run']
+      :r.job_state==='queued'?['queued','']:[r.status,''];
+    st.append(el('span',state[0],'pill '+(state[1]||'')));
+    if(r.error)st.append(el('div',r.error,'muted'));
+    tr.append(st);
+    tr.append(el('td',r.segments?`${r.named} named / ${r.speakers} voices${r.suggested?` · ${r.suggested} suggested`:''}`:'—'));
+    let a=el('td');
+    if(r.has_audio){let b=button('Listen',()=>{let w=el('div',undefined,'card');w.append(el('h2',r.name||r.id),audioFor(r.id));c.append(w);w.scrollIntoView({behavior:'smooth'})});a.append(b)}
+    else a.append(el('span','—','muted'));
+    tr.append(a);
+    let tcell=el('td');
+    if(r.segments){let link=el('a','Open & name speakers');link.href=prefix+'/recordings/'+encodeURIComponent(r.id);tcell.append(link)}
+    else tcell.append(el('span','—','muted'));
+    tr.append(tcell);
+    let ccell=el('td');
+    if(r.segments){let cl=el('a','Compare');cl.href=prefix+'/compare/'+encodeURIComponent(r.id);ccell.append(cl)}
+    else ccell.append(el('span','—','muted'));
+    tr.append(ccell);
+    let ucell=el('td');
+    if(r.segments){let ul=el('a','Check');ul.href=prefix+'/unknowns/'+encodeURIComponent(r.id);ucell.append(ul)}
+    else ucell.append(el('span','—','muted'));
+    tr.append(ucell);
+    return tr;
+  }
+
+  function show(key){
+    view=key;let v=views[view],rows=v.rows;
+    for(let k in buttons)buttons[k].classList.toggle('on',k===view&&k!=='all');
+    heading.textContent=view==='all'?'Recordings':`Recordings · ${v.label}`;
+    clear.classList.toggle('hidden',view==='all');
+    let missing=view==='all'?d.received-recs.length:0;
+    gap.textContent=missing>0?`${missing} discovered in PLAUD but not yet in the library.`:'';
+    gap.classList.toggle('hidden',!gap.textContent);
+    body.replaceChildren(...rows.map(rowFor));
+    if(!rows.length){let tr=el('tr'),td=el('td',`No recordings are ${v.label}.`,'muted');td.colSpan=8;tr.append(td);body.append(tr)}
+  }
+  show('all');
+
+  if(has(cmp)){
+    let box=el('div',undefined,'card');
+    box.append(el('h2','Accuracy vs PLAUD \u00b7 by recording'),
+      el('p','Our local ASR compared against the PLAUD reference transcript. Neither is ground truth \u2014 where they disagree, the audio decides.','muted'));
+    for(let [rid,v] of Object.entries(cmp)){
+      let rec=recs.find(r=>r.id===rid);
+      let sec=el('div');sec.append(el('h3',(rec&&rec.name)||rid));
+      let parts=[`${v.total} differences`,`${v.auto_cosmetic} cosmetic (auto-resolved)`,`${v.escalated} needed judgement`];
+      if(v.sensitive)parts.push(`${v.sensitive} held local-only (sensitive)`);
+      sec.append(el('p',parts.join(' \u00b7 '),'muted'));
+      let av=v.audio_verdicts||{};
+      if(Object.keys(av).length){
+        let tot=Object.values(av).reduce((a,b)=>a+b,0);
+        let line=el('p');
+        line.append(el('strong',`Audio judged ${tot} contested spans: `));
+        line.append(document.createTextNode(
+          `PLAUD right ${Math.round(100*(av.reference||0)/tot)}% \u00b7 ours right ${Math.round(100*(av.ours||0)/tot)}% \u00b7 neither ${Math.round(100*((av.neither||0)+(av.unclear||0))/tot)}%`));
+        sec.append(line);
+      } else if(Object.keys(v.categories||{}).length){
+        sec.append(el('p','Classified, audio judgement pending.','muted'));
+      } else sec.append(el('p','Staged, not yet judged.','muted'));
+      if(v.report)sec.append(el('p',`Full detail: data/eval/${rid}/report.md`,'muted'));
+      box.append(sec);
+    }
+    c.append(box);
+  }
+}
+
+async function compare(rid){
+  let c=$('content');c.replaceChildren(el('a','\u2190 Progress'));c.firstChild.href=prefix+'/';
+  c.append(el('h1','Loading comparison\u2026'));
+  let d=await api('/api/compare/'+encodeURIComponent(rid));
+  c.replaceChildren(el('a','\u2190 Progress'));c.firstChild.href=prefix+'/';
+  c.append(el('h1',d.name||rid));
+  if(!d.available){c.append(el('p','No PLAUD reference transcript for this recording. '+(d.reason||''),'notice'));
+    c.append(el('p','PLAUD only transcribes recordings you spend quota on. Nothing to compare against until it does.','muted'));return}
+  current=await api('/api/recordings/'+encodeURIComponent(rid));
+  let m=d.metrics;
+  let head=el('p');head.append(document.createTextNode('Our transcript: '));head.append(el('span',d.asr_model,'model'));
+  head.append(document.createTextNode(`  \u00b7  PLAUD speakers: ${m.reference_speakers.join(', ')}`));
+  c.append(head);
+  c.append(el('p','PLAUD is a paid reference, not ground truth. Where they disagree, only the audio decides \u2014 disagreement is not automatically our error.','muted'));
+
+  let tiles=el('div',undefined,'tiles');
+  const tile=(n,l,note)=>{let x=el('div',undefined,'tile');x.append(el('div',n,'n'),el('div',l,'l'));if(note)x.append(el('div',note,'muted'));return x};
+  tiles.append(tile((m.agreement*100).toFixed(1)+'%','agreement','matched against the reference'),
+               tile((m.divergence_rate*100).toFixed(1)+'%','divergence','wrong or missing'),
+               tile(m.differences,'differences',`${m.reference_tokens} reference ${m.unit.includes('CJK')?'tokens':'words'}`),
+               tile(m.extra_in_ours,'extra in ours','text PLAUD does not have'));
+  c.append(tiles);
+  c.append(el('p','Counted in '+m.unit+'.','muted'));
+
+  let agree=m.agreement*100, sub=100*m.substituted/Math.max(m.reference_tokens,1),
+      miss=100*m.missing_from_ours/Math.max(m.reference_tokens,1);
+  let g=el('div',undefined,'gauge');
+  [[agree,'g-agree','matches'],[sub,'g-diff','differs'],[miss,'g-miss','missing']].forEach(([v,cls,lab])=>{
+    if(v<=0.2)return;let s=el('div',v>8?`${lab} ${v.toFixed(0)}%`:'',cls);s.style.width=v+'%';g.append(s)});
+  c.append(g);
+  let lg=el('div',undefined,'legend');
+  [['g-agree','matches PLAUD'],['g-diff','different text'],['g-miss','missing from ours']].forEach(([cls,lab])=>{
+    let i=el('span');let b=el('b');b.className=cls;i.append(b,document.createTextNode(lab));lg.append(i)});
+  c.append(lg);
+
+  let card=el('div',undefined,'card');
+  card.append(el('h2','Differences'),el('p','Every point where the two transcripts disagree, in context. Click a timestamp to open it in our transcript.','muted'));
+  // One player for the page; every timestamp seeks it rather than navigating away.
+  let player=audioFor(rid);
+  let bar=el('div',undefined,'audio');bar.append(player);
+  let tune=el('div',undefined,'legend');
+  tune.append(el('span','Start playback '));
+  let sel=el('select');sel.style.width='auto';sel.style.padding='3px 6px';
+  [1,2,3,5,8].forEach(n=>{let o=el('option',n+'s');o.value=n;if(n===3)o.selected=true;sel.append(o)});
+  sel.onchange=()=>{leadIn=Number(sel.value)};
+  tune.append(sel,el('span',' before each difference'));
+  bar.append(tune);
+  c.append(bar);
+  // Lead-in before the difference. A token's time is interpolated within its segment,
+  // so it is an estimate either way; landing early and hearing the run-up is far more
+  // useful than landing on the word and missing what led to it.
+  let leadIn=3;
+  const seekTo=s=>{player.currentTime=Math.max(0,s-leadIn);player.play().catch(()=>{});
+                   bar.scrollIntoView({block:'nearest',behavior:'smooth'})};
+
+  let verdicts=d.verdicts||{};
+  let shown=0;
+  for(let r of d.rows){
+    if(++shown>500)break;
+    let row=el('div',undefined,'cmp');
+
+    let t0=el('div');
+    let edit=el('button','Edit','edit');edit.title='Type what you actually hear';
+    let jump=el('button',stamp(r.start),'seek');jump.title='Play from here';
+    jump.onclick=()=>seekTo(r.start);
+    t0.append(edit,jump,el('div',{replace:'changed',delete:'we missed',insert:'we added'}[r.op]||r.op,'muted'));
+
+    let left=el('div'),right=el('div');
+    left.append(el('div','PLAUD \u00b7 '+(r.reference_speaker||'\u2014'),'lab'));
+
+    // Our speaker labels are editable in place — same naming panel as the transcript.
+    let rl=el('div',undefined,'lab');rl.append(document.createTextNode('ours \u00b7 '));
+    let labels=r.our_names.length?r.our_names:(r.our_speakers.length?r.our_speakers:['\u2014']);
+    labels.forEach((nm,i)=>{
+      if(i)rl.append(document.createTextNode(', '));
+      if(r.segment_ids[0]&&nm!=='\u2014'){
+        let b=el('button',nm,'spk');b.title='Name this speaker';
+        b.onclick=async()=>{let seg=(current&&current.segments||[]).find(s=>s.id===r.segment_ids[0]);
+          if(!seg){showError(Error('Open the transcript first to name speakers.'));return}
+          await nameSpeaker(seg);compare(rid)};
+        rl.append(b);
+      } else rl.append(document.createTextNode(nm));
+    });
+    right.append(rl);
+
+    const body=(mid,cls)=>{let p=el('div');
+      if(r.before)p.append(el('span','\u2026'+r.before+' ','muted'));
+      p.append(el('span',mid||'(nothing)',cls));
+      if(r.after)p.append(el('span',' '+r.after+'\u2026','muted'));return p};
+    let leftBody=body(r.reference,'del'),rightBody=body(r.ours,'ins');
+
+    // Which one the audio actually supports. Saved as the training label.
+    let v=verdicts[r.key]||{};
+    let tRef=el('button','\u2713','tick'),tOurs=el('button','\u2713','tick');
+    tRef.title='PLAUD is right here';tOurs.title='ours is right here';
+    let note=el('div','','edited');
+    const paint=()=>{
+      tRef.classList.toggle('on',v.choice==='reference');
+      tOurs.classList.toggle('on',v.choice==='ours');
+      edit.classList.toggle('on',v.choice==='edited');
+      note.textContent=v.choice==='edited'?'you wrote: '+v.corrected:'';
+    };
+    const save=async(choice,corrected)=>{
+      for(let b of [tRef,tOurs,edit])b.disabled=true;
+      try{
+        if(v.choice===choice&&choice!=='edited'){
+          await api('/api/compare/'+encodeURIComponent(rid)+'/verdict',{key:r.key,choice:'clear'});v={};
+        } else {
+          let saved=await api('/api/compare/'+encodeURIComponent(rid)+'/verdict',
+            {key:r.key,at:r.start,reference:r.reference,ours:r.ours,choice,corrected});
+          v={choice:saved.choice,corrected:saved.corrected};
+        }
+        verdicts[r.key]=v;paint();
+      }catch(e){showError(e)}
+      finally{for(let b of [tRef,tOurs,edit])b.disabled=false}
+    };
+    tRef.onclick=()=>save('reference');
+    tOurs.onclick=()=>save('ours');
+    edit.onclick=()=>{
+      let box=openModal('What do you actually hear?');
+      let p=audioFor(rid);p.currentTime=Math.max(0,r.start-1.5);box.append(p);
+      box.append(el('p','PLAUD: '+(r.reference||'(nothing)'),'muted'),
+                 el('p','ours: '+(r.ours||'(nothing)'),'muted'));
+      let input=el('input');input.type='text';input.value=v.corrected||r.ours||r.reference||'';
+      let lbl=el('label');lbl.append(el('div','Correct text for this passage'),input);box.append(lbl);
+      let go=el('button','Save','primary save');
+      go.onclick=async()=>{closeModal();await save('edited',input.value)};
+      box.append(go);input.focus();
+    };
+
+    // tick sits beside the text it judges, so the choice is where the evidence is
+    let lw=el('div',undefined,'side');lw.append(tRef,leftBody);
+    let rw=el('div',undefined,'side');rw.append(tOurs,rightBody);
+    left.append(lw);right.append(rw,note);
+    paint();
+
+    row.append(t0,left,right);card.append(row);
+  }
+  if(!shown)card.append(el('p','No differences \u2014 the two transcripts agree throughout.','muted'));
+  else if(shown>=500)card.append(el('p','Showing the first 500 differences.','muted'));
+  c.append(card);
+}
+
+async function library(){let c=$('content');c.replaceChildren(el('h1','Your recordings'),el('p','Summaries in Obsidian. Speaker names and corrections live with the source transcript.','muted'));let status=await api('/api/status');if(!status.baseline_complete)c.append(el('p','Automatic intake has not finished activation. Existing test recordings are available below.','notice'));if(status.service_error)c.append(el('p',status.service_error,'error'));if(status.intake_error)c.append(el('p',status.intake_error,'error'));if(status.worker)c.append(el('p',`Processing ${status.worker.stage} · part ${status.worker.chunk||'—'} of ${status.worker.total_chunks||'—'}`,'notice'));for(let job of status.jobs||[]){if(job.state==='failed'){let row=el('div',undefined,'error');row.append(el('p',job.error||'Recording needs attention'),button('Retry processing',async()=>{await api('/api/retry',{recording_id:job.recording_id});await library()}));c.append(row)}}for(let p of status.publication||[])c.append(el('p',p.error||'An Obsidian note update is pending.','notice'));let rows=await api('/api/recordings');if(!rows.length)c.append(el('div','The library is ready for newly available PLAUD recordings.','empty'));for(let r of rows){let a=el('a',undefined,'card record');a.href=prefix+'/recordings/'+encodeURIComponent(r.id);a.append(el('span',humanStatus(r.status),'status'),el('h2',r.name),el('span',`${stamp(r.duration)} · ${r.status==='downloaded'?'transcription pending':'timestamped transcript'}`,'muted'));c.append(a)}}
+async function recording(rid){current=await api('/api/recordings/'+encodeURIComponent(rid));let c=$('content');c.replaceChildren(el('a','← Recordings'));c.firstChild.href=prefix+'/';c.append(el('h1',current.name));if(current.speaker_source==='current-fallback')c.append(el('p','Speaker labels: standard method. The new speaker attribution could not run for this recording.','notice'));let tabs=el('div',undefined,'bar');tabs.append(el('p','Machine transcript · select a speaker label to confirm or correct a name. Unassigned turns need individual review.','muted'),button('Refresh',()=>recording(rid)));c.append(tabs);if(current.error)c.append(el('p',current.error,'error'));mainAudio=audioFor(rid);let wrap=el('div',undefined,'audio');wrap.append(mainAudio);c.append(wrap);let transcript=el('div',undefined,'card');if(!current.segments.length)transcript.append(el('p','Transcript processing is pending.','muted'));if(!current.segments.length)c.append(el('p',current.status==='downloaded'?'Transcription is pending.':'No speech was transcribed. The original audio is retained for review.','notice'));for(let s of current.segments){let row=el('div',undefined,'segment');row.id=s.id;row.append(button(stamp(s.start),()=>{mainAudio.currentTime=s.start;return mainAudio.play()},'time'),button(s.profile_name||s.speaker,()=>nameSpeaker(s),'speaker'),el('p',s.text));transcript.append(row)}c.append(transcript);if(location.hash){let target=document.getElementById(decodeURIComponent(location.hash.slice(1)));if(target)target.scrollIntoView()}}
+async function nameSpeaker(segment){let box=openModal('Name this speaker'),profiles=await api('/api/profiles'),selected=segment.profile_id,key=crypto.randomUUID();let preview=audioFor(current.id);box.append(preview);let start=el('input');start.type='number';start.step='.01';start.min=segment.start;start.max=Math.max(segment.start,segment.end-5);start.value=segment.start;let end=()=>Math.min(segment.end,Number(start.value)+5);let lab=el('label','Sample starts at (seconds)');lab.append(start);box.append(lab);let info=el('p',`${Math.min(5,segment.end-segment.start).toFixed(1)}-second sample from this segment. This is the sample saved to the voice profile.`,'muted');box.append(info);preview.addEventListener('play',()=>{if(preview.currentTime<Number(start.value)||preview.currentTime>=end())preview.currentTime=Number(start.value)});preview.addEventListener('timeupdate',()=>{if(preview.currentTime>=end())preview.pause()});start.onchange=()=>{preview.currentTime=Number(start.value)};let name=el('input');name.type='text';name.placeholder='Enter a new name';name.maxLength=100;box.append(name);let matches=el('div',undefined,'choices');box.append(button('Find voice matches',async()=>{if(end()-Number(start.value)<4.999){note.textContent='This segment is shorter than five seconds. You can still name it; matching needs a five-second sample.';return}note.textContent='Comparing voices…';let j=await api('/api/lookup',{recording_id:current.id,start:Number(start.value),end:end()});matches.replaceChildren();for(let p of j.matches){let b=button(p.name,()=>choose(p.profile_id,b));b.append(el('span',`Match score ${p.confidence.toFixed(3)}`,'score'));matches.append(b)}note.textContent=j.matches.length?'Higher scores mean a closer voice match. These are suggestions, not verified identities.':'No usable voice match yet. Select a name below or create a profile.'}),matches);box.append(el('p','Recently used names','muted'));let choices=el('div',undefined,'choices');function choose(pid,b){selected=pid;name.value='';choices.querySelectorAll('button').forEach(x=>x.classList.remove('selected'));matches.querySelectorAll('button').forEach(x=>x.classList.remove('selected'));if(b)b.classList.add('selected')}for(let p of profiles){let b=button(p.name,()=>choose(p.id,b));if(p.id===selected)b.classList.add('selected');b.append(el('span',`${p.id.slice(0,6)} · ${p.active_samples}/100 samples`,'muted'));choices.append(b)}box.append(choices);name.oninput=()=>{selected=null;choices.querySelectorAll('button').forEach(x=>x.classList.remove('selected'))};for(let [value,text] of [['segment','Apply to this segment'],['speaker','Apply to all segments from this speaker in this recording']]){let l=el('label'),radio=el('input');radio.type='radio';radio.name='scope';radio.value=value;radio.checked=value===(segment.speaker==='UNASSIGNED'?'segment':'speaker');radio.disabled=value==='speaker'&&segment.speaker==='UNASSIGNED';l.append(radio,document.createTextNode(text));box.append(l)}let note=el('p','','muted');box.append(note);let save=button('Save',async()=>{save.disabled=true;try{if(!selected){if(!name.value.trim())throw Error('Choose an existing person or enter a name.');selected=(await api('/api/profiles',{name:name.value.trim(),key:'new-'+key})).id}let data={recording_id:current.id,segment_id:segment.id,profile_id:selected,scope:box.querySelector('input[name=scope]:checked').value,version:current.version,key,start:Number(start.value),end:end()};let result;try{result=await api('/api/identify',data)}catch(e){if(e.code==='conflicting_labels'&&confirm(e.message+' Apply this name to those segments too?'))result=await api('/api/identify',{...data,confirm_conflicts:true});else throw e}note.textContent=result.enrollment==='insufficient_speech'?'Name saved. Voice enrollment needs usable speech.':result.publication==='complete'?'Saved. Transcript, voice profile and Obsidian are updated.':'Saved. The Obsidian update is pending and will retry.';await recording(current.id);save.textContent='Saved';setTimeout(closeModal,1500)}catch(e){note.textContent=e.message;save.disabled=false}},'primary save');box.append(save);preview.currentTime=segment.start}
+async function profiles(){let c=$('content');c.replaceChildren(el('h1','Voice profiles'),el('p','Up to 100 active samples per person, ranked by voice-match confidence.','muted'));for(let p of await api('/api/profiles')){let card=el('div',undefined,'card');card.append(el('h2',p.name),el('p',`${p.active_samples} active samples · ${p.total_samples} confirmed sample records`,'muted'),button('View samples',async()=>{let box=openModal(p.name);for(let s of await api('/api/profiles/'+p.id+'/samples')){let row=el('div',undefined,'card');let a=el('a',`Open transcript at ${stamp(s.start)}`);a.href=prefix+'/recordings/'+s.recording_id+'#'+s.segment_id;row.append(a,el('p',s.confidence===null?'Seed sample · not yet scored':`Match confidence ${s.confidence.toFixed(3)}${s.active?'':' · inactive'}`,'muted'));if(s.provenance?.annotation?.scope)row.append(el('p','Earlier confirmation: '+s.provenance.annotation.scope,'muted'));let audio=audioFor(s.recording_id);audio.onplay=()=>{if(audio.currentTime<s.start||audio.currentTime>=s.end)audio.currentTime=s.start};audio.ontimeupdate=()=>{if(audio.currentTime>=s.end)audio.pause()};row.append(audio);box.append(row)}}));c.append(card)}}
+async function lookup(){let c=$('content');c.replaceChildren(el('h1','Identify a voice'),el('p','Choose a five-second preview from an audio file. Lookup alone does not add it to a profile.','muted'));let box=el('div',undefined,'card'),file=el('input');file.type='file';file.accept='audio/*';let audio=el('audio');audio.controls=true;let start=el('input');start.type='number';start.min=0;start.step='.1';start.value=0;let note=el('p','','muted'),results=el('div');box.append(file,audio,el('p','Start time in seconds'),start,note,results);let objectURL;file.onchange=()=>{if(objectURL)URL.revokeObjectURL(objectURL);if(file.files[0])audio.src=objectURL=URL.createObjectURL(file.files[0])};audio.ontimeupdate=()=>{if(audio.currentTime>=Number(start.value)+5)audio.pause()};audio.onplay=()=>{if(audio.currentTime<Number(start.value)||audio.currentTime>=Number(start.value)+5)audio.currentTime=Number(start.value)};box.append(button('Find matching voice',async()=>{if(!file.files[0])throw Error('Choose an audio file first.');note.textContent='Comparing sample…';let data=await file.files[0].arrayBuffer();if(data.byteLength>10*1024*1024)throw Error('Choose a file under 10 MB.');let binary='';for(let b of new Uint8Array(data))binary+=String.fromCharCode(b);let u=await api('/api/upload',{audio:btoa(binary)});if(Number(start.value)+5>u.duration+.001)throw Error('Choose a full five-second interval inside the audio.');let j=await api('/api/lookup',{upload_id:u.upload_id,start:Number(start.value),end:Number(start.value)+5});results.replaceChildren();for(let p of j.matches)results.append(el('h2',p.name),el('p',`Match score ${p.confidence.toFixed(3)}`,'score'));note.textContent=j.matches.length?j.confidence_note:'No usable matches yet. Confirm speakers in a transcript to build your voice store.'},'primary'));c.append(box)}
+
+async function unknowns(rid){
+  let c=$('content');c.replaceChildren();
+  let back=el('a','← Progress');back.href=prefix+'/';c.append(back);
+  let d=await api('/api/unknowns/'+encodeURIComponent(rid));
+  c.append(el('h1','Check the unknowns'),el('p',d.name||rid,'muted'));
+  if(!d.available){c.append(el('p',d.reason,'notice'));return}
+  if(!d.proposals.length){c.append(el('div','Nothing to check here — no stretch of unknown speech had both a speaker who resumed afterwards and acoustic support.','empty'));return}
+  c.append(el('p','Each row is a stretch nobody was named for. The pipeline thinks it is the person who was already talking, and the voice match agrees. Listen, then say whether it is right. Nothing here changes the transcript — it records whether the rule can be trusted.','muted'));
+  let audio=audioFor(rid);let wrap=el('div',undefined,'audio');wrap.append(audio);c.append(wrap);
+  let counts=el('p',undefined,'notice');c.append(counts);
+  const tally=()=>{let r=0,w=0,u=0;for(let p of d.proposals){if(p.checked==='right')r++;else if(p.checked==='wrong')w++;else if(p.checked==='unsure')u++}
+    let done=r+w;counts.textContent=`${d.proposals.length} proposals · ${d.offered_words} of ${d.unknown_words} unknown words`
+      +(done?` · you have judged ${done}: ${r} right, ${w} wrong${u?`, ${u} unsure`:''} — ${(100*r/done).toFixed(0)}% right so far`:'')
+      +(d.held_back?` · ${d.held_back} held back because the voice match did not support them`:'')};
+  tally();
+  let card=el('div',undefined,'card');
+  for(let p of d.proposals){
+    let row=el('div',undefined,'segment');row.style.gridTemplateColumns='160px 1fr';
+    let left=el('div');
+    let play=button(stamp(p.start),()=>{audio.currentTime=Math.max(0,p.start-3);return audio.play()},'seek');
+    left.append(play,el('div',p.proposed,'speaker'),el('div',p.evidence,'muted'));
+    let body=el('div');
+    body.append(el('div',`${p.before.speaker} … ${p.before.text}`,'muted'));
+    let said=el('p',p.text);said.style.fontWeight='600';body.append(said);
+    body.append(el('div',`then ${p.after.speaker}: ${p.after.text}…`,'muted'));
+    let pick=el('div',undefined,'pick');
+    const mark=async(choice,btn)=>{
+      await api('/api/unknowns/'+encodeURIComponent(rid)+'/verdict',
+        {key:p.key,choice,proposed:p.proposed,evidence:p.evidence,at:p.start,text:p.text});
+      p.checked=choice;for(let b of pick.children)b.classList.toggle('on',b===btn);tally()};
+    for(let [label,choice] of [['Right','right'],['Wrong','wrong'],['Not sure','unsure']]){
+      let b=button(label,()=>mark(choice,b));if(p.checked===choice)b.classList.add('on');pick.append(b)}
+    body.append(pick);
+    row.append(left,body);card.append(row);
+  }
+  c.append(card);
+}
+let route=location.pathname.slice(prefix.length);(route.startsWith('/recordings/')?recording(decodeURIComponent(route.slice(12))):route.startsWith('/compare/')?compare(decodeURIComponent(route.slice(9))):route.startsWith('/unknowns/')?unknowns(decodeURIComponent(route.slice(10))):route==='/profiles'?profiles():route==='/lookup'?lookup():route==='/library'?library():progress()).catch(showError);
+</script></body></html>

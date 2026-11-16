@@ -1,0 +1,18 @@
+# Household data and runtime state - never committed
+data/
+runtime/
+work/
+out/
+config.local.json
+tools/blocklist.local.txt
+
+# Python / tooling
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+*.log
+.env
+:memory:.ses

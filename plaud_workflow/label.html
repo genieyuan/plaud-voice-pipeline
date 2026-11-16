@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Speaker labelling</title>
+<style>
+:root{color-scheme:light dark;font:16px system-ui,sans-serif}body{margin:0;background:#f4f1eb;color:#222}
+header,main{max-width:1100px;margin:auto;padding:1rem}.grid{display:grid;grid-template-columns:18rem 1fr;gap:1rem}
+.card{background:#fff;border:1px solid #d5d0c7;border-radius:12px;padding:1rem}button,input,select{font:inherit}
+button{min-height:44px;border:1px solid #777;border-radius:8px;padding:.5rem .75rem;background:#fff;color:#222}
+button:focus,input:focus{outline:3px solid #155eef}.tasks{display:grid;gap:.4rem;max-height:70vh;overflow:auto}
+.task{text-align:left}.task[disabled]{opacity:.55}#timeline{overflow-x:auto}#wave{width:100%;height:70px}
+.lane{height:44px;border:1px solid #bbb;position:relative;margin:.5rem 0;background:#fafafa;min-width:100%}
+.turn{position:absolute;top:4px;bottom:4px;background:#78a9ff;border-radius:5px;min-width:4px}.noscore .turn{background:#bbb}
+.handle{position:absolute;top:0;bottom:0;width:12px;padding:0;min-height:0;border:0;background:#174ea6}.handle.left{left:0}.handle.right{right:0}
+.controls{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}.fields{display:grid;gap:.7rem;margin-top:1rem}
+.notice{padding:.7rem;border-radius:8px;background:#fff3cd}.hidden{display:none}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.tasks{max-height:13rem}header,main{padding:.75rem}}
+@media(prefers-color-scheme:dark){body{background:#161616;color:#eee}.card,button{background:#242424;color:#eee}.lane{background:#303030}}
+</style>
+<header><h1>Who spoke when?</h1><p>Blind speaker labels. Speaker lanes may overlap; use NOSCORE only when speech cannot be judged.</p></header>
+<main><div id="limit" class="notice hidden">Active labelling has reached 600 minutes. Please ask the operator.</div>
+<div class="grid"><section class="card"><h2>Excerpts</h2><div id="tasks" class="tasks"></div></section>
+<section class="card"><h2 id="heading">Choose an excerpt</h2><div id="editor" class="hidden">
+<div class="controls"><button id="play">Play</button><label>Speed <select id="speed"><option>.5</option><option>.75</option><option selected>1</option><option>1.25</option><option>1.5</option></select></label><label>Zoom <input id="zoom" type="range" min="1" max="8" value="1"></label></div>
+<audio id="audio" preload="metadata"></audio><canvas id="wave"></canvas><div id="timeline"><div id="lanes"></div></div><button id="add">Add speaker lane</button>
+<div class="fields"><fieldset id="languages"><legend>Languages heard</legend>
+<label><input type="checkbox" value="English"> English</label>
+<label><input type="checkbox" value="Mandarin"> Mandarin</label>
+<label><input type="checkbox" value="Cantonese"> Cantonese</label>
+<label><input type="checkbox" value="Other"> Other</label></fieldset>
+<label><input id="cantonese" type="checkbox"> Cantonese heard</label><label><input id="switch" type="checkbox"> Code-switching heard</label>
+<label><input id="blind" type="checkbox"> I attest that I viewed no system output or transcript of this recording.</label>
+<label><input id="silent" type="checkbox"> No speech</label><div class="controls"><button id="draft">Save draft</button><button id="submit">Submit final</button></div><p id="status" aria-live="polite"></p></div>
+</div></section></div>
+<section id="transcripts" class="card hidden" style="margin-top:1rem">
+<style>#word-tasks{display:flex;gap:.5rem;flex-wrap:wrap}.word-segments{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(15rem,100%),1fr));gap:.7rem}.word-segment{border:1px solid #bbb;border-radius:8px;padding:.7rem}.word-segment textarea{box-sizing:border-box;width:100%;min-height:6rem;font:inherit}.word-meta{display:flex;justify-content:space-between;gap:.5rem}.word-overlap{border-color:#155eef}</style>
+<h2>Transcript tasks</h2><div id="word-limit" class="notice hidden">Transcript time reached 180 minutes. Please ask the operator.</div>
+<div id="word-tasks"></div><div id="word-editor" class="hidden">
+<h3 id="word-heading"></h3><div class="controls"><button id="word-play">Play</button><label>Speed <select id="word-speed"><option>.5</option><option>.75</option><option selected>1</option><option>1.25</option><option>1.5</option></select></label></div>
+<audio id="word-audio" preload="metadata"></audio><div id="word-segments" class="word-segments"></div>
+<label><input id="word-attest" type="checkbox"> I typed these words from the audio only; I saw no transcript or system output.</label>
+<div class="controls"><button id="word-draft">Save draft</button><button id="word-submit">Submit transcript</button></div><p id="word-status" aria-live="polite"></p>
+</div></section></main>
+<script>
+const q=s=>document.querySelector(s),tasks=q('#tasks'),audio=q('#audio'),lanes=q('#lanes'),wave=q('#wave');let current=null,data={turns:[],active_seconds:0,playback_seconds:0,edits:0},started=Date.now(),last=Date.now(),peaks=[];
+async function api(path,options={}){let r=await fetch(path,options),body=await r.json().catch(()=>({}));if(!r.ok)throw Error(body.error||`HTTP ${r.status}`);return body}
+function tick(){let now=Date.now();if(!document.hidden&&current)data.active_seconds+=(now-last)/1000;last=now;if(data.active_seconds>=36000){q('#limit').classList.remove('hidden');q('#submit').disabled=true}setTimeout(tick,1000)}tick();
+async function list(){let rows=await api('/api/label/tasks');tasks.replaceChildren(...rows.map(row=>{let b=document.createElement('button');b.className='task';b.textContent=`${row.task} — ${row.state}`;b.disabled=row.state==='locked'||row.state==='submitted';b.onclick=()=>openTask(row.task);return b}))}
+async function openTask(task){current=task;q('#status').textContent='';let item=await api(`/api/label/tasks/${task}`);data=item.draft||{turns:[],active_seconds:0,playback_seconds:0,edits:0};peaks=item.peaks;q('#heading').textContent=task;q('#editor').classList.remove('hidden');audio.src=`/api/label/audio/${task}`;(()=>{let a={en:'English',eng:'English',english:'English',zh:'Mandarin',cmn:'Mandarin',mandarin:'Mandarin','普通话':'Mandarin','國語':'Mandarin','国语':'Mandarin','普通話':'Mandarin',yue:'Cantonese',cantonese:'Cantonese','粤语':'Cantonese','粵語':'Cantonese','广东话':'Cantonese','廣東話':'Cantonese'},heard=(data.languages||[]).map(x=>a[String(x).trim().toLocaleLowerCase()]||'Other');q('#languages').querySelectorAll('input').forEach(x=>x.checked=heard.includes(x.value))})();q('#cantonese').checked=!!data.strata_human?.cantonese;q('#switch').checked=!!data.strata_human?.code_switch;q('#blind').checked=!!data.attestations?.blind;q('#silent').checked=!!data.no_speech;render();drawWave()}
+function drag(e,t,edge,lane){e.stopPropagation();let x=e.clientX,start=t.start,dur=t.dur;function move(v){let delta=(v.clientX-x)*audio.duration/lane.clientWidth;if(edge==='left'){t.start=Math.max(0,Math.min(start+dur-.05,start+delta));t.dur=start+dur-t.start}else t.dur=Math.max(.05,Math.min(audio.duration-start,dur+delta));data.edits++;render()}function up(){removeEventListener('pointermove',move);removeEventListener('pointerup',up)}addEventListener('pointermove',move);addEventListener('pointerup',up)}
+function render(){lanes.innerHTML='';let names=[...new Set(['spk1','NOSCORE',...data.turns.map(x=>x.speaker)])];for(let name of names){let d=document.createElement('div');d.className='lane '+(name==='NOSCORE'?'noscore':'');d.style.width=(100*+q('#zoom').value)+'%';d.dataset.speaker=name;d.textContent=name;d.onclick=e=>{if(e.target!==d)return;let start=audio.currentTime,dur=Math.min(2,audio.duration-start);data.turns.push({speaker:name,start,dur});data.edits++;render()};for(let t of data.turns.filter(x=>x.speaker===name)){let v=document.createElement('span');v.className='turn';v.style.left=(100*t.start/audio.duration||0)+'%';v.style.width=(100*t.dur/audio.duration||1)+'%';v.title=`${t.start.toFixed(2)}–${(t.start+t.dur).toFixed(2)}`;for(let edge of ['left','right']){let h=document.createElement('button');h.className='handle '+edge;h.ariaLabel=`Drag ${edge} edge`;h.onpointerdown=e=>drag(e,t,edge,d);v.append(h)}d.append(v)}lanes.append(d)}}
+function drawWave(){let c=wave.getContext('2d'),ratio=devicePixelRatio||1;wave.width=wave.clientWidth*ratio;wave.height=70*ratio;c.clearRect(0,0,wave.width,wave.height);c.strokeStyle='#155eef';c.beginPath();peaks.forEach((p,i)=>{let x=i*wave.width/peaks.length,y=wave.height*p/2;c.moveTo(x,wave.height/2-y);c.lineTo(x,wave.height/2+y)});c.stroke()}
+q('#play').onclick=()=>audio.paused?audio.play():audio.pause();audio.onloadedmetadata=()=>render();audio.onplay=()=>q('#play').textContent='Pause';audio.onpause=()=>q('#play').textContent='Play';audio.ontimeupdate=()=>{if(!audio.paused)data.playback_seconds+=.25};q('#speed').onchange=e=>audio.playbackRate=+e.target.value;q('#zoom').oninput=render;
+q('#add').onclick=()=>{let n=[...lanes.children].filter(x=>!x.classList.contains('noscore')).length+1;if(n<=99){data.turns.push({speaker:`spk${n}`,start:0,dur:.001});render()}};
+function body(){let rttm=data.turns.filter(x=>x.dur>.001).map(x=>x.speaker==='NOSCORE'?`NOSCORE ${current} 1 ${x.start.toFixed(3)} ${x.dur.toFixed(3)}`:`SPEAKER ${current} 1 ${x.start.toFixed(3)} ${x.dur.toFixed(3)} <NA> <NA> ${x.speaker} <NA> <NA>`).join('\n');return {...data,rttm:rttm+(rttm?'\n':''),languages:[...q('#languages').querySelectorAll('input:checked')].map(x=>x.value),strata_human:{cantonese:q('#cantonese').checked,code_switch:q('#switch').checked},attestations:{blind:q('#blind').checked},no_speech:q('#silent').checked,started_utc:new Date(started).toISOString(),session_hash_prefix:'browser'}}
+async function save(kind){try{await api(`/api/label/tasks/${current}/${kind}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body())});q('#status').textContent=kind==='draft'?'Draft saved':'Submitted';await list()}catch(e){q('#status').textContent=e.message}}
+q('#draft').onclick=()=>save('draft');q('#submit').onclick=()=>save('submit');window.addEventListener('keydown',e=>{if(!current||!/^Digit[1-9]$/.test(e.code)||e.repeat)return;let speaker='spk'+e.code.slice(5);data.turns.push({speaker,start:audio.currentTime,dur:.1,held:true});render()});window.addEventListener('keyup',e=>{let speaker='spk'+e.code.slice(5),t=[...data.turns].reverse().find(x=>x.speaker===speaker&&x.held);if(t){t.dur=Math.max(.05,audio.currentTime-t.start);delete t.held;data.edits++;render()}});list().catch(e=>q('#status').textContent=e.message);
+</script>
+<script id="transcripts-js">
+const wt=q('#word-tasks'),we=q('#word-editor'),wa=q('#word-audio'),ws=q('#word-segments');
+let word=null,wordData=null,wordActive=0,wordLast=Date.now();
+async function wordApi(path,options={}){let r=await fetch(path,options),value=await r.json().catch(()=>({}));if(!r.ok){let e=Error(value.error||`HTTP ${r.status}`);e.status=r.status;throw e}return value}
+function wordBody(){return {segments:[...ws.querySelectorAll('.word-segment')].map(row=>({seg:row.dataset.seg,text:row.querySelector('textarea').value,unclear:row.querySelector('input[type=checkbox]').checked})),active_seconds:wordActive,attestation_audio_only:q('#word-attest').checked,page_sha256:'browser-served'}}
+async function wordList(){try{
+let rows=await wordApi('/api/label/words');q('#transcripts').classList.remove('hidden');
+wt.replaceChildren(...rows.map(row=>{let b=document.createElement('button');b.textContent=`${row.task} — ${row.state}`;b.disabled=row.state==='submitted';b.onclick=()=>openWord(row.task);return b}))
+}catch(e){if(e.status===404){q('#transcripts').classList.add('hidden');return}q('#word-status').textContent=e.message}}
+async function openWord(task){word=task;wordData=await wordApi(`/api/label/words/${task}`);wordActive=wordData.draft?.active_seconds||0;wordLast=Date.now();q('#word-heading').textContent=task;we.classList.remove('hidden');wa.src=`/api/label/audio/${wordData.audio_task}`;q('#word-attest').checked=!!wordData.draft?.attestation_audio_only;ws.replaceChildren();let saved=new Map((wordData.draft?.segments||[]).map(x=>[x.seg,x]));
+for(let seg of wordData.segments){let row=document.createElement('div');row.className='word-segment';row.dataset.seg=seg.seg;if(wordData.segments.some(x=>x.seg!==seg.seg&&x.start<seg.end&&seg.start<x.end))row.classList.add('word-overlap');let meta=document.createElement('div');meta.className='word-meta';let lane=document.createElement('strong');lane.textContent=seg.speaker;let time=document.createElement('span');time.textContent=`${seg.start.toFixed(1)}–${seg.end.toFixed(1)} s`;meta.append(lane,time);let play=document.createElement('button');play.textContent='▶ this turn';play.onclick=()=>{wa.currentTime=wordData['window_'+'start_s']+seg.start;wa.play()};let area=document.createElement('textarea');area.setAttribute('autocomplete','off');area.setAttribute('autocorrect','off');area.setAttribute('autocapitalize','off');area.setAttribute('spellcheck','false');area.value=saved.get(seg.seg)?.text||'';area.onblur=()=>saveWord('draft',true);let unclear=document.createElement('label'),box=document.createElement('input');box.type='checkbox';box.checked=!!saved.get(seg.seg)?.unclear;unclear.append(box,' can’t make out the words');row.append(meta,play,area,unclear);ws.append(row)}
+wa.onloadedmetadata=()=>{wa.currentTime=Math.min(wordData['window_'+'start_s'],wa.duration)};q('#word-status').textContent=''}
+async function saveWord(kind,quiet=false){if(!word||(!q('#word-attest').checked&&quiet))return;try{
+await wordApi(`/api/label/words/${word}/${kind}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(wordBody())});q('#word-status').textContent=kind==='draft'?'Draft saved':'Transcript submitted';
+if(kind==='submit'){word=null;we.classList.add('hidden');await wordList()}
+}catch(e){if(!quiet)q('#word-status').textContent=e.message;if(e.status===409&&e.message.includes('180 minutes')){q('#word-limit').classList.remove('hidden');q('#word-draft').disabled=q('#word-submit').disabled=true}}}
+q('#word-play').onclick=()=>{let start=wordData['window_'+'start_s'],end=Math.min(start+60,wa.duration);if(wa.currentTime<start||wa.currentTime>=end)wa.currentTime=start;wa.paused?wa.play():wa.pause()};
+q('#word-speed').onchange=e=>wa.playbackRate=+e.target.value;
+wa.ontimeupdate=()=>{if(!wordData)return;let start=wordData['window_'+'start_s'],end=Math.min(start+60,wa.duration);if(wa.currentTime<start)wa.currentTime=start;if(wa.currentTime>=end){wa.pause();wa.currentTime=end}};
+q('#word-draft').onclick=()=>saveWord('draft');q('#word-submit').onclick=()=>saveWord('submit');
+setInterval(()=>{let now=Date.now();if(word&&!document.hidden){wordActive+=(now-wordLast)/1000;if(wordActive>=10800){q('#word-limit').classList.remove('hidden');q('#word-draft').disabled=q('#word-submit').disabled=true}}wordLast=now},1000);
+setInterval(()=>saveWord('draft',true),10000);wordList();
+</script></html>

@@ -1,0 +1,33 @@
+{
+  "_comment": "Copy to config.local.json (gitignored), replace every <placeholder>, then run: python -c 'from plaud_workflow.config import initialize; print(initialize())'. That writes runtime/config.json, which the service reads. Keys starting with _ are ignored.",
+  "account_id": "<plaud-account-id, as printed by `plaud me`>",
+  "notes": "~/plaud-data/notes",
+  "archive_remote": "<user>@<nas-host>:/path/to/plaud/untranscribed",
+  "runtimes": {
+    "ffmpeg": "/opt/homebrew/bin/ffmpeg",
+    "ffprobe": "/opt/homebrew/bin/ffprobe",
+    "asr_python": "/path/to/asr-venv/bin/python",
+    "speaker_python": "/path/to/speaker-venv/bin/python"
+  },
+  "models": {
+    "asr": {"path": "/path/to/models/whisper-model.pt", "sha256": "<sha256 of the file>"},
+    "speaker": {"path": "/path/to/models/speaker-embedding.onnx", "sha256": "<sha256 of the file>"},
+    "segmentation": {"path": "/path/to/models/pyannote-segmentation.onnx", "sha256": "<sha256 of the file>"}
+  },
+  "_asr_backend": "Optional. Set \"asr_backend\": \"qwen3\" plus the three qwen_* keys below to use the MLX Qwen3 ASR + forced aligner instead of Whisper.",
+  "_qwen_manifest": "/path/to/qwen-manifest.json  ({\"files\": {\"<path>\": \"<sha256>\", ...}})",
+  "_qwen_asr_model": "/path/to/models/Qwen3-ASR",
+  "_qwen_aligner_model": "/path/to/models/Qwen3-ForcedAligner",
+  "speaker_attribution": "current",
+  "_speaker_attribution": "\"current\" keeps the sherpa-onnx speaker turns. \"new_mix\" enables the Nemotron attribute stage; it needs the nemotron block, which `python -m plaud_workflow.attribution manifest --config-merge` writes after `runtime-deploy`.",
+  "_nemotron_example": {
+    "home": "/path/to/project/runtime/nemotron",
+    "manifest": "/path/to/project/runtime/nemotron/MANIFEST.json",
+    "manifest_sha256": "<filled in by --config-merge>",
+    "preset": "v3-offline",
+    "device": "metal",
+    "nice": 10,
+    "deadline_floor_s": 600,
+    "deadline_ratio": 0.25
+  }
+}
