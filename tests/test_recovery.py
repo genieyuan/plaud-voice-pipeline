@@ -1,6 +1,11 @@
 import json,tempfile,time,unittest
 from pathlib import Path
 from unittest.mock import patch
+
+import importlib.util
+HAS_COMPARISON_HELPERS = all(importlib.util.find_spec(m) is not None for m in ('tools_eval_diff', 'evaluation'))
+needs_comparison_helpers = unittest.skipUnless(HAS_COMPARISON_HELPERS,
+    'needs the comparison helpers (tools_eval_diff, evaluation.filters), which are not published')
 from plaud_workflow.store import Store,Conflict
 from plaud_workflow.publication import publish,publish_pending,managed,digest
 from plaud_workflow.compare import ReferenceOutcome,ReferenceUnavailable
@@ -151,6 +156,7 @@ class ReconciliationTimingContract(unittest.TestCase):
         self.assertEqual([r['recording_id'] for r in overflow], [])
         self.assertFalse(full_request_admissible(self.s, now))
 
+    @needs_comparison_helpers
     def test_stale_claim_recovers_and_targeted_work_does_not_reopen_job(self):
         from plaud_workflow.compare import ReferenceOutcome
         now = 10000

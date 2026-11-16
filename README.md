@@ -190,7 +190,7 @@ Playwright.
 - The evaluation package and divergence classifier that `compare.py` imports lazily
   (`tools_eval_diff`, `evaluation.filters`). Without them the compare stage records the
   comparison as unavailable, and the five comparison-artefact tests in `tests/test_compare.py`
-  and `tests/test_recovery.py` fail.
+  and `tests/test_recovery.py` are skipped.
 - The design documents and tech specs that the code comments cite (CR-05, CR-06, relabel v5).
 
 ## Checking a copy before publishing
@@ -199,6 +199,20 @@ Playwright.
 every commit message. It looks for private terms (from a local, gitignored list), private
 network addresses, home-directory paths, e-mail addresses and secret-looking strings. It
 exits non-zero on any finding.
+
+## Third-party credits
+
+None of these are bundled; you install them yourself under their own terms.
+
+- **NVIDIA Nemotron-3 Diarization** (speaker turns for the attribute stage), run through a
+  `nemo-speech` build. Check NVIDIA's model licence before use.
+- **OpenAI Whisper** or **Qwen3-ASR** with **Qwen3-ForcedAligner** (speech recognition with
+  word timings), the latter on Apple **MLX**.
+- **sherpa-onnx** with a **pyannote** segmentation model and a speaker-embedding model
+  (per-chunk turns and voice embeddings).
+- **FFmpeg** (`ffmpeg` / `ffprobe`), called as an external program.
+- **PLAUD's own CLI** (`@plaud-ai/cli`) for listing recordings and fetching audio from your
+  own PLAUD account.
 
 ## Licence
 

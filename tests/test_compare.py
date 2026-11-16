@@ -7,6 +7,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import importlib.util
+HAS_COMPARISON_HELPERS = all(importlib.util.find_spec(m) is not None for m in ('tools_eval_diff', 'evaluation'))
+needs_comparison_helpers = unittest.skipUnless(HAS_COMPARISON_HELPERS,
+    'needs the comparison helpers (tools_eval_diff, evaluation.filters), which are not published')
+
 from plaud_workflow.store import Store
 
 from plaud_workflow.compare import (ReferenceAdapter, COMPARATOR_VERSION, import_legacy_reference_caches, recover_reconciliation_artifacts, canonical_rows,
@@ -210,6 +215,7 @@ class ImmutablePublicationContract(unittest.TestCase):
         self.assertTrue(changed)
         self.assertEqual(len(self.store.rows('SELECT * FROM reference_revisions')), 2)
 
+    @needs_comparison_helpers
     def test_comparison_tuple_is_unique_and_legacy_mirror_comes_from_that_tuple(self):
         rows = [{'start': 1, 'end': 3, 'speaker': 'P', 'text': 'reference fixture'}]
         ref_hash, _ = publish_reference_revision(
@@ -250,6 +256,7 @@ class LegacyBackfillContract(unittest.TestCase):
                 store.close()
 
 class ReconciliationNonFunctionalContract(unittest.TestCase):
+    @needs_comparison_helpers
     def test_reconciliation_preserves_pipeline_state_and_logs_no_transcript_text(self):
         from plaud_workflow.compare import ReferenceOutcome
         from plaud_workflow.service import Reconciler
@@ -302,6 +309,7 @@ class ReconciliationNonFunctionalContract(unittest.TestCase):
             finally:
                 store.close()
 
+    @needs_comparison_helpers
     def test_restart_repairs_staged_rows_and_marks_missing_complete_artifact(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp); store = Store(root / 'state.sqlite')
@@ -368,6 +376,7 @@ class PublicationFaultInjectionContract(unittest.TestCase):
                 finally:
                     store.close()
 
+    @needs_comparison_helpers
     def test_every_comparison_boundary_converges_twice(self):
         points = ('file:plaud-transcript.json','file:ours-transcript.json',
                   'file:divergences.json','file:staged.json','manifest','directory',
